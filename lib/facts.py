@@ -1,8 +1,13 @@
-import os.path
-import csv
-import random
+"""
+Facts form the graph of data points and relationships between them.
 
-BABY_NAMES = os.path.join(os.path.dirname(__file__), '..', 'data', 'baby-names.csv')
+This generates a very simple family tree.
+"""
+
+import random
+import faker
+
+FAKE = faker.Faker()
 
 def make_geneology(depth, width):
     # This generates a geneology by selecting an initial seed population
@@ -11,76 +16,102 @@ def make_geneology(depth, width):
     # The babies form the next round
     # This is heavily simplified OBVIOUSLY
 
-    data = _read_baby_data()
-    id = _id_generator()
-    events, people, pairs = _make_ancestors(id, data, width)
+    events, people = _make_ancestors(width)
+    parents = people
 
-    for i in range(depth):
-        next_generation = []
-
-        for pair in pairs:
-            p_events, p_babies = _procreate(id, data, *pair)
-            events += p_events
-            people += p_babies
-            next_generation += p_babies
-
-        marriages, pairs = _pair_off(next_generation)
-        events += marriages
-
-        if not pairs:
-            return (events, people)
+    for _ in range(depth):
+        generation_events, parents = _make_generation(parents, width)
+        events += generation_events
+        people += parents
 
     return (events, people)
 
-def _id_generator():
-    id = 0
-    while True:
-        id += 1
-        yield id
+def _make_ancestors(width):
+    people = [
+        Person.boy() if i % 2 == 0 else Person.girl()
+        for i in range(width)
+    ]
+    events, _ = _pair_off(people)
 
-def _read_baby_data():
-    with open(BABY_NAMES, 'r') as handle:
-        reader = csv.DictReader(handle)
-        return list(reader)
+    return (events, people)
 
-def _random_boy(id, data):
-    return _cooerce(id, random.choice([v for v in data if v['sex'] == 'boy']))
+def _make_generation(parents, width):
+    marriages, pairs = _pair_off(parents)
 
-def _random_girl(id, data):
-    return _cooerce(id, random.choice([v for v in data if v['sex'] == 'girl']))
+    if not pairs:
+        return marriages, []
 
-def _random_person(id, data):
-    return _cooerce(id, random.choice(data))
+    births = [
+        BirthEvent.make(random.choice(pairs))
+        for _ in range(width)
+    ]
 
-def _cooerce(id, datum):
-    return { 'id': id.__next__(), 'name': datum['name'], 'sex': datum['sex'] }
-
-def _make_ancestors(id, data, width):
-    boys = [_random_boy(id, data) for v in range(width // 2)]
-    girls = [_random_girl(id, data) for v in range(width // 2)]
-    people = boys + girls
-
-    events, pairs = _pair_off(people)
-
-    return (events, people, pairs)
+    return marriages + births, [birth.child for birth in births]
 
 def _pair_off(people):
-    boys = [boy for boy in people if boy['sex'] == 'boy']
-    girls = [girl for girl in people if girl['sex'] == 'girl']
+    boys = [person for person in people if person.is_male()]
+    girls = [person for person in people if person.is_female()]
 
     if (not boys) or (not girls):
         return ([], [])
 
     pairs = list(zip(boys, girls)) # so arbitrary
-    events = [
-        { 'type': 'marriage', 'members': [b, g] }
-        for (b, g) in pairs
-    ]
+    events = [MarriageEvent(couple) for couple in pairs]
 
     return (events, pairs)
 
-def _procreate(id, data, daddy, mummy):
-    child = _random_person(id, data)
-    event = { 'type': 'birth', 'parents': [daddy, mummy], 'child': child }
 
-    return ([event], [child])
+class Person:
+
+    @staticmethod
+    def boy():
+        return Person('male')
+
+    @staticmethod
+    def girl():
+        return Person('female')
+
+    @staticmethod
+    def make():
+        return Person(random.choice(['male', 'female']))
+
+    def __init__(self, gender):
+        self.gender = gender
+        self.name = FAKE.name_male() if self.gender == 'male' else FAKE.name_female()
+
+    def is_male(self):
+        return self.gender == 'male'
+
+    def is_female(self):
+        return self.gender == 'female'
+
+    def __repr__(self):
+        return f'Person({self.gender}, {self.name})'
+
+class Event:
+
+    def __repr__(self):
+        return 'Event()'
+
+class MarriageEvent(Event):
+
+    def __init__(self, couple):
+        self.type = 'marriage'
+        self.couple = couple
+
+    def __repr__(self):
+        return f'Event({self.type}, {self.couple})'
+
+class BirthEvent(Event):
+
+    @staticmethod
+    def make(parents):
+        return BirthEvent(parents, Person.make())
+
+    def __init__(self, parents, child):
+        self.type = 'birth'
+        self.parents = parents
+        self.child = child
+
+    def __repr__(self):
+        return f'Event({self.type}, {self.parents}, {self.child})'
