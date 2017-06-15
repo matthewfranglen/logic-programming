@@ -72,12 +72,15 @@ def _pair_off(people):
         return ([], [])
 
     pairs = list(zip(boys, girls)) # so arbitrary
-    events = [('married', b, g) for (b, g) in pairs]
+    events = [
+        { 'type': 'marriage', 'members': [b, g] }
+        for (b, g) in pairs
+    ]
 
     return (events, pairs)
 
 def _procreate(id, data, daddy, mummy):
     child = _random_person(id, data)
-    event = ('born', child, daddy, mummy)
+    event = { 'type': 'birth', 'parents': [daddy, mummy], 'child': child }
 
     return ([event], [child])
