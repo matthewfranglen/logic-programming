@@ -73,11 +73,10 @@ class ChildExpression(Expression):
         return []
 
     def resolve(self, events, people):
-        children = lambda parent: self.children.reify(get_children(events, people, parent))
-        return (
-            (parent, children(parent))
-            for parent in self.parents
-        )
+        for parent in self.parents:
+            children = self.children.reify(get_children(events, people, parent))
+            if children:
+                yield (parent, children)
 
 def get_children(events, _, parent):
     return set(
