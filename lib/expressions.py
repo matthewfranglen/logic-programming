@@ -73,13 +73,10 @@ class ChildExpression(Expression):
         return []
 
     def resolve(self, events, people):
+        children = lambda parent: self.children.reify(get_children(events, people, parent))
         return (
-            (parent, child)
+            (parent, children(parent))
             for parent in self.parents
-            for child in set.intersection(
-                get_children(events, people, parent),
-                self.children
-            )
         )
 
 def get_children(events, _, parent):
