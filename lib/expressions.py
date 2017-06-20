@@ -15,11 +15,58 @@ Established values are reified placeholders.
 They only match a single person.
 """
 
+import abc
+
+class Expression(abc.ABC):
+
+    @abc.abstractmethod
+    def expand(self):
+        """ This transforms the expression into other expressions that are equivalent """
+        pass
+
+    @abc.abstractmethod
+    def resolve(self, events, people):
+        """ This attempts to apply the expression to return valid answers from the args sets """
+        pass
+
+class ParentExpression(Expression):
+
+    def __init__(self, children, parents):
+        self.parents = parents
+        self.children = children
+
+    def expand(self):
+        return [ChildExpression(self.parents, self.children)]
+
+    def resolve(self, events, people):
+        return []
+
+
+class ChildExpression(Expression):
+
+    def __init__(self, parents, children):
+        self.parents = parents
+        self.children = children
+
+    def expand(self):
+        return []
+
+    def resolve(self, events, people):
+        return (
+            (parent, child)
+            for parent in self.parents
+            for child in set.intersection(
+                get_children(events, people, parent),
+                self.children
+            )
+        )
 
 def get_children(events, _, parent):
-    return [
+    return set(
         event.child
         for event in events
         if event.type == 'birth'
         and parent in event.parents
-    ]
+    )
+
+# get_partners
