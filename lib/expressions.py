@@ -17,6 +17,27 @@ They only match a single person.
 
 import abc
 
+class Value:
+
+    def __init__(self, label, *values):
+        self.label = label
+        self.values = values
+
+    def reify(self, values):
+        """ This returns a reduced value which is the intersection of the two values """
+        return Value(self.label, *set(self.values).intersection(values))
+
+    def __len__(self):
+        return len(self.values)
+
+    def __iter__(self):
+        """ This allows reify to work over any iterable by making Value an iterable """
+        return self.values.__iter__()
+
+    def __repr__(self):
+        return f'Value({self.label}, {self.values})'
+
+
 class Expression(abc.ABC):
 
     @abc.abstractmethod
