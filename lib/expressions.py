@@ -25,7 +25,8 @@ class Value:
 
     def reify(self, values):
         """ This returns a reduced value which is the intersection of the two values """
-        return Value(self.label, *set(self.values).intersection(values))
+        intersection = set(self.values).intersection(values)
+        return Value(self.label, *intersection)
 
     def __len__(self):
         return len(self.values)
