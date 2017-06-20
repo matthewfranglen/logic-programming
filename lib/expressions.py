@@ -33,7 +33,7 @@ class Value:
 
     def __iter__(self):
         """ This allows reify to work over any iterable by making Value an iterable """
-        return self.values.__iter__()
+        return iter(self.values)
 
     def __repr__(self):
         return f'Value({self.label}, {self.values})'
@@ -63,6 +63,8 @@ class ParentExpression(Expression):
     def resolve(self, events, people):
         return []
 
+    def __repr__(self):
+        return f'get_parents({self.children}) intersected with {self.parents}'
 
 class ChildExpression(Expression):
 
@@ -78,6 +80,9 @@ class ChildExpression(Expression):
             children = self.children.reify(get_children(events, people, parent))
             if children:
                 yield (parent, children)
+
+    def __repr__(self):
+        return f'get_children({self.parents}) intersected with {self.children}'
 
 def get_children(events, _, parent):
     return set(
