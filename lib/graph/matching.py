@@ -8,13 +8,13 @@ def find_subgraphs(graph, subgraph):
     if not subgraph:
         return []
 
-    starting_vertex, *remainder = [vertex.label for vertex in subgraph.vertexes]
+    starting_vertex, *remainder = subgraph.vertexes
 
     return (
-        subgraph
+        sg
         for graph_vertex in graph.vertexes
-        for subgraph in _resolve_subgraph(
-            graph, subgraph, {starting_vertex: graph_vertex.label}, remainder
+        for sg in _resolve_subgraph(
+            graph, subgraph, {starting_vertex: graph_vertex}, remainder
         )
     )
 
@@ -46,10 +46,10 @@ def _resolve_subgraph(graph, subgraph, node_mapping, unmapped_subgraph_vertexes)
     ]
 
     return (
-        subgraph
+        sg
         for graph_vertex in graph.vertexes
-        for subgraph in _resolve_subgraph(
-            graph, subgraph, {vertex: graph_vertex.label, **node_mapping}, unmapped
+        for sg in _resolve_subgraph(
+            graph, subgraph, {vertex: graph_vertex, **node_mapping}, unmapped
         )
         if all(
             graph.get_matching_edges(mapped_subgraph_vertexes[edge.start], graph_vertex, edge.label)
