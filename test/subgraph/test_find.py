@@ -75,5 +75,14 @@ class TestFindSubgraph(unittest.TestCase):
         self.assertEqual(1, len(subgraphs))
         self.assertSetEqual(set(['a', 'b']), set(subgraphs[0]))
 
+    def test_identity_edge_filtering(self):
+        match = nx.MultiDiGraph()
+        match.add_edge(1, 1, label='s')
+
+        subgraphs = [
+            list(graph) for graph in find_all_subgraphs(GRAPH, match)
+        ]
+        self.assertEqual([], subgraphs)
+
 if __name__ == '__main__':
     unittest.main()

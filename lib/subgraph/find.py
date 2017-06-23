@@ -11,13 +11,7 @@ def find_all_subgraphs(graph, match):
     if not match:
         return []
 
-    node, *remaining = match
-
-    return (
-        graph.subgraph(nodes)
-        for graph_node in graph
-        for nodes in _find(graph, match, {node: graph_node}, remaining)
-    )
+    return _find(graph, match, {}, match)
 
 def _find(graph, match, mapping, unmapped):
     """
@@ -28,7 +22,7 @@ def _find(graph, match, mapping, unmapped):
     nodes as the match does.
     """
     if not unmapped:
-        return graph.subgraph(mapping.values())
+        return [graph.subgraph(mapping.values())]
 
     node, *remaining = unmapped
     mapped = set(mapping.keys())
@@ -43,12 +37,19 @@ def _find(graph, match, mapping, unmapped):
         for edge in match.out_edges(node, data=True)
         if edge[1] in mapped
     ]
+    identity_edges = [
+        edge[2]['label']
+        for edge in match.edges(node, data=True)
+        if edge[0] == edge[1]
+    ]
 
     return (
-        _find(graph, match, {node: graph_node, **mapping}, remaining)
+        subgraph
         for graph_node in graph
+        for subgraph in _find(graph, match, {node: graph_node, **mapping}, remaining)
         if _all_in_edges_present(graph, graph_node, in_edges)
         and _all_out_edges_present(graph, graph_node, out_edges)
+        and _all_identity_edges_present(graph, graph_node, identity_edges)
     )
 
 def _all_in_edges_present(graph, graph_node, in_edges):
@@ -64,3 +65,11 @@ def _all_out_edges_present(graph, graph_node, out_edges):
         for edge in graph.out_edges(graph_node, data=True)
     ]
     return all(edge in graph_edges for edge in out_edges)
+
+def _all_identity_edges_present(graph, graph_node, identity_edges):
+    graph_edges = [
+        edge[2]['label']
+        for edge in graph.edges(graph_node, data=True)
+        if edge[0] == edge[1]
+    ]
+    return all(edge in graph_edges for edge in identity_edges)
