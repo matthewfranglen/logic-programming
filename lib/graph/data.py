@@ -12,26 +12,19 @@ Graph: This is a collection of Vertexes and Edges.
 """
 
 from collections import defaultdict
-from functools import reduce
 
 class Graph:
 
     def __init__(self, vertexes, edges):
-        self.vertexes = reduce(
-            lambda map, vertex: map.__setitem__(vertex.label, vertex),
-            vertexes,
-            {}
-        )
-        self.edges = reduce(
-            lambda map, edge: map[edge.start].append(edge),
-            edges,
-            defaultdict(list)
-        )
-        self.inverse_edges = reduce(
-            lambda map, edge: map[edge.end].append(edge),
-            edges,
-            defaultdict(list)
-        )
+        self.vertexes = {}
+        for vertex in vertexes:
+            self.vertexes[vertex.label] = vertex
+
+        self.edges = defaultdict(list)
+        self.inverse_edges = defaultdict(list)
+        for edge in edges:
+            self.edges[edge.start].append(edge)
+            self.inverse_edges[edge.end].append(edge)
 
     def get_vertex(self, vertex_label):
         return self.vertexes[vertex_label]
