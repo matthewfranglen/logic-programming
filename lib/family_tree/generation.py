@@ -15,6 +15,9 @@ def make_family_tree(generations, size):
     # This is heavily simplified OBVIOUSLY
 
     family_tree = nx.MultiDiGraph()
+    if generations <= 0 or size <= 0:
+        return family_tree
+
     pairs = _add_ancestors(family_tree, size)
     parents = pairs
 

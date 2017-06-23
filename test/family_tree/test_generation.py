@@ -6,6 +6,7 @@ class TestTreeGeneration(unittest.TestCase):
 
     def test_no_ancestors(self):
         self.assertEqual(0, len(make_family_tree(0, 0)))
+        self.assertEqual(0, len(make_family_tree(0, 10)))
 
     def test_small_tree(self):
         family_tree = make_family_tree(25, 25)
