@@ -31,13 +31,24 @@ class Value:
     def __len__(self):
         return len(self.values)
 
-    def __iter__(self):
-        """ This allows reify to work over any iterable by making Value an iterable """
-        return iter(self.values)
+    def __contains__(self, value):
+        """ This allows reify to work over lists as well as Values """
+        return value in self.values
 
     def __repr__(self):
         return f'Value({self.label}, {self.values})'
 
+class UnboundValue(Value):
+
+    def __init__(self, label):
+        super().__init__(self, label)
+
+    def reify(self, values):
+        return Value(self.label, *values)
+
+    def __contains__(self, value):
+        """ This allows reify to work over lists as well as Values """
+        return True
 
 class Expression(abc.ABC):
 
@@ -50,6 +61,22 @@ class Expression(abc.ABC):
     def resolve(self, events, people):
         """ This attempts to apply the expression to return valid answers from the args sets """
         pass
+
+class AncestorExpression(Expression):
+
+    def __init__(self, children, ancestors):
+        self.ancestors = ancestors
+        self.children = children
+
+    def expand(self):
+        return [ChildExpression(self.ancestors, self.children)]
+
+    def resolve(self, events, people):
+        return []
+
+    def __repr__(self):
+        return f'get_ancestors({self.children}) intersected with {self.ancestors}'
+
 
 class ParentExpression(Expression):
 
