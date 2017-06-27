@@ -7,6 +7,9 @@ def find_all_subgraphs(graph, match):
     The subgraph is matched by edge label only. All of the edges must be
     present in the subgraph, however nodes that are distinct in the match are
     not required to be distinct in the match.
+
+    This returns a generator returning the subgraph and the mapping from the
+    match nodes to the graph nodes for each subgraph found.
     """
     if not match:
         return []
@@ -22,7 +25,8 @@ def _find(graph, match, mapping, unmapped):
     nodes as the match does.
     """
     if not unmapped:
-        return [graph.subgraph(mapping.values())]
+        subgraph = graph.subgraph(mapping.values())
+        return [(subgraph, mapping)]
 
     node, *remaining = unmapped
     mapped = set(mapping.keys())
@@ -44,9 +48,9 @@ def _find(graph, match, mapping, unmapped):
     ]
 
     return (
-        subgraph
+        subgraph_and_mapping
         for graph_node in graph
-        for subgraph in _find(graph, match, {node: graph_node, **mapping}, remaining)
+        for subgraph_and_mapping in _find(graph, match, {node: graph_node, **mapping}, remaining)
         if _all_in_edges_present(graph, graph_node, in_edges)
         and _all_out_edges_present(graph, graph_node, out_edges)
         and _all_identity_edges_present(graph, graph_node, identity_edges)
