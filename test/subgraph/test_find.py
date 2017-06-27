@@ -4,8 +4,8 @@ import networkx as nx
 from lib.subgraph import find_all_subgraphs
 
 GRAPH = nx.MultiDiGraph()
-GRAPH.add_edge('a', 'b', label='s')
-GRAPH.add_edge('a', 'b', label='t')
+GRAPH.add_edge('a', 'b', key='s')
+GRAPH.add_edge('a', 'b', key='t')
 
 def perform_find(match):
     return [
@@ -50,7 +50,7 @@ class TestFindSubgraph(unittest.TestCase):
 
     def test_connected_nodes(self):
         match = nx.MultiDiGraph()
-        match.add_edge(1, 2, label='s')
+        match.add_edge(1, 2, key='s')
 
         result = perform_find(match)
         expected = [
@@ -60,9 +60,9 @@ class TestFindSubgraph(unittest.TestCase):
         self.assertEqual(1, len(result))
         self.assertEqual(expected, result)
 
-    def test_label_filtering(self):
+    def test_key_filtering(self):
         match = nx.MultiDiGraph()
-        match.add_edge(1, 2, label='x')
+        match.add_edge(1, 2, key='x')
 
         result = perform_find(match)
 
@@ -70,8 +70,8 @@ class TestFindSubgraph(unittest.TestCase):
 
     def test_direction_filtering(self):
         match = nx.MultiDiGraph()
-        match.add_edge(1, 2, label='s')
-        match.add_edge(2, 1, label='t')
+        match.add_edge(1, 2, key='s')
+        match.add_edge(2, 1, key='t')
 
         result = perform_find(match)
 
@@ -79,8 +79,8 @@ class TestFindSubgraph(unittest.TestCase):
 
     def test_multi_edge_filtering(self):
         match = nx.MultiDiGraph()
-        match.add_edge(1, 2, label='s')
-        match.add_edge(1, 2, label='t')
+        match.add_edge(1, 2, key='s')
+        match.add_edge(1, 2, key='t')
 
         result = perform_find(match)
         expected = [
@@ -92,7 +92,7 @@ class TestFindSubgraph(unittest.TestCase):
 
     def test_identity_edge_filtering(self):
         match = nx.MultiDiGraph()
-        match.add_edge(1, 1, label='s')
+        match.add_edge(1, 1, key='s')
 
         result = perform_find(match)
 

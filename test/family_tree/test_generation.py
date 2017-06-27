@@ -21,9 +21,9 @@ class TestTreeGeneration(unittest.TestCase):
         self.assertTrue(any(person.is_male() for person in family_tree))
         self.assertTrue(any(person.is_female() for person in family_tree))
 
-        self.assertTrue(any(edge[2]['label'] == MARRIAGE for edge in family_tree.edges(data=True)))
-        self.assertTrue(any(edge[2]['label'] == FATHER for edge in family_tree.edges(data=True)))
-        self.assertTrue(any(edge[2]['label'] == MOTHER for edge in family_tree.edges(data=True)))
+        self.assertTrue(any(edge[2] == MARRIAGE for edge in family_tree.edges(keys=True)))
+        self.assertTrue(any(edge[2] == FATHER for edge in family_tree.edges(keys=True)))
+        self.assertTrue(any(edge[2] == MOTHER for edge in family_tree.edges(keys=True)))
 
 if __name__ == '__main__':
     unittest.main()

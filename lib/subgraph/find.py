@@ -4,9 +4,9 @@ def find_all_subgraphs(graph, match):
     The subgraphs are returned as a derived graph based on the node list, so
     all edges are present - even ones not present in match.
 
-    The subgraph is matched by edge label only. All of the edges must be
-    present in the subgraph, however nodes that are distinct in the match are
-    not required to be distinct in the match.
+    The subgraph is matched by edge key only. All of the edges must be present
+    in the subgraph, however nodes that are distinct in the match are not
+    required to be distinct in the match.
 
     This returns a generator returning the subgraph and the mapping from the
     match nodes to the graph nodes for each subgraph found.
@@ -32,18 +32,18 @@ def _find(graph, match, mapping, unmapped):
     mapped = set(mapping.keys())
 
     in_edges = [
-        (mapping[edge[0]], edge[2]['label'])
-        for edge in match.in_edges(node, data=True)
+        (mapping[edge[0]], edge[2])
+        for edge in match.in_edges(node, keys=True)
         if edge[0] in mapped
     ]
     out_edges = [
-        (mapping[edge[1]], edge[2]['label'])
-        for edge in match.out_edges(node, data=True)
+        (mapping[edge[1]], edge[2])
+        for edge in match.out_edges(node, keys=True)
         if edge[1] in mapped
     ]
     identity_edges = [
-        edge[2]['label']
-        for edge in match.edges(node, data=True)
+        edge[2]
+        for edge in match.edges(node, keys=True)
         if edge[0] == edge[1]
     ]
 
@@ -58,22 +58,22 @@ def _find(graph, match, mapping, unmapped):
 
 def _all_in_edges_present(graph, graph_node, in_edges):
     graph_edges = [
-        (edge[0], edge[2]['label'])
-        for edge in graph.in_edges(graph_node, data=True)
+        (edge[0], edge[2])
+        for edge in graph.in_edges(graph_node, keys=True)
     ]
     return all(edge in graph_edges for edge in in_edges)
 
 def _all_out_edges_present(graph, graph_node, out_edges):
     graph_edges = [
-        (edge[1], edge[2]['label'])
-        for edge in graph.out_edges(graph_node, data=True)
+        (edge[1], edge[2])
+        for edge in graph.out_edges(graph_node, keys=True)
     ]
     return all(edge in graph_edges for edge in out_edges)
 
 def _all_identity_edges_present(graph, graph_node, identity_edges):
     graph_edges = [
-        edge[2]['label']
-        for edge in graph.edges(graph_node, data=True)
+        edge[2]
+        for edge in graph.edges(graph_node, keys=True)
         if edge[0] == edge[1]
     ]
     return all(edge in graph_edges for edge in identity_edges)

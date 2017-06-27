@@ -32,8 +32,8 @@ def _add_ancestors(graph, size):
 
     pairs = _pair_off(people)
     for pair in pairs:
-        graph.add_edge(pair[0], pair[1], label=MARRIAGE)
-        graph.add_edge(pair[1], pair[0], label=MARRIAGE)
+        graph.add_edge(pair[0], pair[1], key=MARRIAGE)
+        graph.add_edge(pair[1], pair[0], key=MARRIAGE)
 
     return pairs
 
@@ -43,8 +43,8 @@ def _add_generation(graph, parents, size):
 
     births = [(Person.make(), couple) for couple in random.choices(parents, k=size)]
     for birth in births:
-        graph.add_edge(birth[0], birth[1][0], label=FATHER)
-        graph.add_edge(birth[0], birth[1][1], label=MOTHER)
+        graph.add_edge(birth[0], birth[1][0], key=FATHER)
+        graph.add_edge(birth[0], birth[1][1], key=MOTHER)
 
     return _pair_off(birth[0] for birth in births)
 
