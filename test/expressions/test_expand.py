@@ -59,45 +59,37 @@ class TestExpressionExpansion(GraphTestCase):
 
         result = expand(expression)
 
+        intermediary = MockSymbol()
         for expected in [
                 make_expression_graph(1, 2, ANCESTOR),
                 make_expression_graph(1, 2, PARENT),
+                make_expression_graph(1, intermediary, PARENT, intermediary, 2, ANCESTOR),
                 make_expression_graph(1, 2, FATHER),
                 make_expression_graph(1, 2, MOTHER)
         ]:
-            self.assertGraphEqual(
+            self.assertSymbolGraphEqual(
                 expected,
                 result.__next__()
             )
-
-        intermediary = MockSymbol()
-        self.assertSymbolGraphEqual(
-            make_expression_graph(1, intermediary, PARENT, intermediary, 2, ANCESTOR),
-            result.__next__()
-        )
 
     def test_infinite_descendant_expand(self):
         expression = make_expression_graph(2, 1, DESCENDANT)
 
         result = expand(expression)
 
+        intermediary = MockSymbol()
         for expected in [
                 make_expression_graph(2, 1, DESCENDANT),
                 make_expression_graph(1, 2, ANCESTOR),
                 make_expression_graph(1, 2, PARENT),
+                make_expression_graph(1, intermediary, PARENT, intermediary, 2, ANCESTOR),
                 make_expression_graph(1, 2, FATHER),
                 make_expression_graph(1, 2, MOTHER)
         ]:
-            self.assertGraphEqual(
+            self.assertSymbolGraphEqual(
                 expected,
                 result.__next__()
             )
-
-        intermediary = MockSymbol()
-        self.assertSymbolGraphEqual(
-            make_expression_graph(1, intermediary, PARENT, intermediary, 2, ANCESTOR),
-            result.__next__()
-        )
 
 def make_expression_graph(*edges):
     expression = nx.MultiDiGraph()
