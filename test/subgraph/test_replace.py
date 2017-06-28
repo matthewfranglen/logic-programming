@@ -21,7 +21,7 @@ class TestReplaceSubgraph(GraphTestCase):
 
     def test_remove_node(self):
         match = nx.MultiDiGraph()
-        match.add_node(1)
+        match.add_node('a')
         mapping = {1: 'a'}
         replacement = nx.MultiDiGraph()
 
@@ -33,7 +33,7 @@ class TestReplaceSubgraph(GraphTestCase):
 
     def test_remove_edge(self):
         match = nx.MultiDiGraph()
-        match.add_edge(1, 2, key='s')
+        match.add_edge('a', 'b', key='s')
         mapping = {1: 'a', 2: 'b'}
         replacement = nx.MultiDiGraph()
         replacement.add_nodes_from([1, 2])
@@ -46,7 +46,7 @@ class TestReplaceSubgraph(GraphTestCase):
 
     def test_reverse_edge(self):
         match = nx.MultiDiGraph()
-        match.add_edge(1, 2, key='s')
+        match.add_edge('a', 'b', key='s')
         mapping = {1: 'a', 2: 'b'}
         replacement = nx.MultiDiGraph()
         replacement.add_edge(2, 1, key='s')
@@ -60,7 +60,7 @@ class TestReplaceSubgraph(GraphTestCase):
 
     def test_add_identity_edge(self):
         match = nx.MultiDiGraph()
-        match.add_node(1)
+        match.add_node('a')
         mapping = {1: 'a'}
         replacement = nx.MultiDiGraph()
         replacement.add_edge(1, 1, key='id')
@@ -75,7 +75,7 @@ class TestReplaceSubgraph(GraphTestCase):
 
     def test_add_edge(self):
         match = nx.MultiDiGraph()
-        match.add_nodes_from([1, 2])
+        match.add_nodes_from(['a', 'b'])
         mapping = {1: 'a', 2: 'b'}
         replacement = nx.MultiDiGraph()
         replacement.add_edge(2, 1, key='u')
@@ -90,7 +90,7 @@ class TestReplaceSubgraph(GraphTestCase):
 
     def test_add_node(self):
         match = nx.MultiDiGraph()
-        match.add_node(1)
+        match.add_node('a')
         mapping = {1: 'a'}
         replacement = nx.MultiDiGraph()
         replacement.add_nodes_from([1, 2])
@@ -105,7 +105,7 @@ class TestReplaceSubgraph(GraphTestCase):
 
     def test_add_node_and_edge(self):
         match = nx.MultiDiGraph()
-        match.add_node(1)
+        match.add_node('a')
         mapping = {1: 'a'}
         replacement = nx.MultiDiGraph()
         replacement.add_edge(2, 1, key='u')
@@ -120,7 +120,7 @@ class TestReplaceSubgraph(GraphTestCase):
 
     def test_argument_unaltered(self):
         match = nx.MultiDiGraph()
-        match.add_node(1)
+        match.add_node('a')
         mapping = {1: 'a'}
         replacement = nx.MultiDiGraph()
         replacement.add_nodes_from([1, 2])

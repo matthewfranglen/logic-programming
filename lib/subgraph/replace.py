@@ -14,16 +14,18 @@ def replace_subgraph(graph, match, mapping, replacement):
     """
     result = nx.MultiDiGraph(graph)
 
-    result.remove_edges_from(_to_graph_edges(mapping, match))
+    result.remove_edges_from(match.edges(keys=True))
 
-    for missing_node in set(replacement).difference(match):
+    for missing_node in (node for node in replacement if node not in mapping):
         graph_node = _Symbol()
         mapping[missing_node] = graph_node
         result.add_node(graph_node)
 
     result.remove_nodes_from(
-        mapping[node]
-        for node in set(match).difference(replacement)
+        node
+        for node in set(match).difference(
+            mapping[replacement_node] for replacement_node in replacement
+        )
     )
 
     for source, destination, key in _to_graph_edges(mapping, replacement):
