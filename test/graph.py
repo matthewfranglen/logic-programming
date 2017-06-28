@@ -4,8 +4,19 @@ class GraphTestCase(unittest.TestCase):
 
     def assertGraphEqual(self, expected, actual): # pylint: disable-msg=invalid-name
         # This is named in violation of PEP8 in order to be consistent with the unittest module
-        self.assertSetEqual(set(expected), set(actual))
-        self.assertSetEqual(set(expected.edges(keys=True)), set(actual.edges(keys=True)))
+        expected_edges = expected.edges(keys=True)
+        actual_edges = actual.edges(keys=True)
+
+        self.assertSetEqual(
+            set(expected.edges(keys=True)),
+            set(actual.edges(keys=True)),
+            f'Edges different: {expected_edges} compared to {actual_edges}'
+        )
+        self.assertSetEqual(
+            set(expected),
+            set(actual),
+            f'Nodes different: {list(expected)} compared to {list(actual)}'
+        )
 
     def assertSymbolGraphEqual(self, expected, actual): # pylint: disable-msg=invalid-name
         """
@@ -59,16 +70,35 @@ class GraphTestCase(unittest.TestCase):
             if is_symbol_edge(edge)
         ]
 
-        self.assertSetEqual(set(expected_nodes), set(actual_nodes))
-        self.assertEqual(len(expected_symbol_nodes), len(actual_symbol_nodes))
+        self.assertSetEqual(
+            set(expected_nodes),
+            set(actual_nodes),
+            f'Non Symbol Nodes different: {expected_nodes} compared to {actual_nodes}'
+        )
+        self.assertEqual(
+            len(expected_symbol_nodes),
+            len(actual_symbol_nodes),
+            f'Symbol Nodes different: {expected_symbol_nodes} compared to {actual_symbol_nodes}'
+        )
 
-        self.assertSetEqual(set(expected_edges), set(actual_edges))
-        self.assertEqual(len(expected_symbol_edges), len(actual_symbol_edges))
+        self.assertSetEqual(
+            set(expected_edges),
+            set(actual_edges),
+            f'Non Symbol Edges different: {expected_edges} compared to {actual_edges}'
+        )
+        self.assertEqual(
+            len(expected_symbol_edges),
+            len(actual_symbol_edges),
+            f'Symbol Edges different: {expected_symbol_edges} compared to {actual_symbol_edges}'
+        )
         for edge in expected_symbol_edges:
-            self.assertTrue(any(
-                symbol_sensitive_edge_equals(edge, actual_edge)
-                for actual_edge in actual_symbol_edges
-            ), f'Check failed for {edge} in {actual_symbol_edges}')
+            self.assertTrue(
+                any(
+                    symbol_sensitive_edge_equals(edge, actual_edge)
+                    for actual_edge in actual_symbol_edges
+                ),
+                f'Missing Symbol Edge: {edge} in {actual_symbol_edges}'
+            )
 
 def is_symbol(obj):
     return type(obj).__name__ == '_Symbol' or isinstance(obj, MockSymbol)
