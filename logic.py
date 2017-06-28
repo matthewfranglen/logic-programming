@@ -1,39 +1,35 @@
 #!/usr/bin/env python
 
 import itertools
-import lib.facts as facts
-import lib.expressions as expressions
+import networkx as nx
+
+from lib.family_tree import make_family_tree
+from lib.expressions import PARENT, CHILD, expand
+from lib.subgraph import find_all_subgraphs
 
 def main():
-    events, people = facts.make_geneology(10, 10)
+    family_tree = make_family_tree(10, 10)
+    expression = nx.MultiDiGraph()
+    expression.add_edge('a', 'b', key=PARENT)
+    expression.add_edge('b', 'c', key=CHILD)
 
-    parents = expressions.Value('parents', *people)
-    children = expressions.Value('children', *people)
-    is_parent = expressions.ParentExpression(children, parents)
+    print('Given Graph:')
+    for source, destination, key in family_tree.edges(keys=True):
+        print(f'\t{key}: {source} -> {destination}')
+    print()
 
-    for solution in itertools.islice(solve(events, people, is_parent), 10):
-        print(solution)
+    print('Given Expression:', expression.edges(keys=True)) # pylint: disable-msg=unexpected-keyword-arg,line-too-long
+    print()
 
-def solve(events, people, expression):
-    return (
-        resolution
-        for expansion in expand(expression)
-        for resolution in resolve(events, people, expansion)
-    )
+    for solution in itertools.islice(solve(family_tree, expression), 10):
+        print('Solution:')
+        for key, mapping in sorted(solution.items()):
+            print(f'\t{key} = {mapping}')
 
-def resolve(events, people, expression):
-    return expression.resolve(events, people)
-
-def expand(expression):
-    # TODO: Try to prevent cyclic expansions!
-    yield expression
-
-    for expansion in (
-            v
-            for e in expression.expand()
-            for v in expand(e)
-        ):
-        yield expansion
+def solve(graph, expression):
+    for expansion in expand(expression):
+        for _, solution in find_all_subgraphs(graph, expansion):
+            yield solution
 
 if __name__ == '__main__':
     main()
