@@ -46,7 +46,12 @@ def _add_generation(graph, parents, size):
         graph.add_edge(birth[0], birth[1][0], key=FATHER)
         graph.add_edge(birth[0], birth[1][1], key=MOTHER)
 
-    return _pair_off(birth[0] for birth in births)
+    pairs = _pair_off([birth[0] for birth in births])
+    for pair in pairs:
+        graph.add_edge(pair[0], pair[1], key=MARRIAGE)
+        graph.add_edge(pair[1], pair[0], key=MARRIAGE)
+
+    return pairs
 
 def _pair_off(people):
     boys = [person for person in people if person.is_male()]
